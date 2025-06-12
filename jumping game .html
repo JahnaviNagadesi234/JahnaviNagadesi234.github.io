@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Running Dog Game</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: #b3e5fc;
+      margin: 0;
+      padding: 0;
+    }
+
+    #game {
+      position: relative;
+      width: 800px;
+      height: 200px;
+      background-color: #c8e6c9;
+      overflow: hidden;
+      margin: 30px auto;
+      border: 2px solid #333;
+    }
+
+    #runner {
+      font-size: 50px;
+      position: absolute;
+      bottom: 0;
+      left: 50px;
+    }
+
+    .obstacle {
+      width: 20px;
+      height: 40px;
+      background: #6d4c41;
+      position: absolute;
+      bottom: 0;
+      border-radius: 5px;
+    }
+
+    #status {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🐶 Dog Running Game</h2>
+  <p>Press Spacebar to Jump and Avoid Obstacles!</p>
+  <div id="game">
+    <div id="runner">🐶</div>
+  </div>
+  <p id="status">Score: 0</p>
+
+  <script>
+    const runner = document.getElementById('runner');
+    const game = document.getElementById('game');
+    const status = document.getElementById('status');
+    let isJumping = false;
+    let score = 0;
+    let gameOver = false;
+
+    function jump() {
+      if (isJumping || gameOver) return;
+      isJumping = true;
+      let pos = 0;
+      const up = setInterval(() => {
+        if (pos >= 100) {
+          clearInterval(up);
+          const down = setInterval(() => {
+            if (pos <= 0) {
+              clearInterval(down);
+              isJumping = false;
+            } else {
+              pos -= 5;
+              runner.style.bottom = pos + 'px';
+            }
+          }, 20);
+        } else {
+          pos += 5;
+          runner.style.bottom = pos + 'px';
+        }
+      }, 20);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        if (gameOver) location.reload(); // Restart game
+        else jump();
+      }
+    });
+
+    function createObstacle() {
+      if (gameOver) return;
+
+      const obstacle = document.createElement('div');
+      obstacle.classList.add('obstacle');
+      obstacle.style.left = '800px';
+      game.appendChild(obstacle);
+
+      let pos = 800;
+      const move = setInterval(() => {
+        if (gameOver) {
+          clearInterval(move);
+          if (game.contains(obstacle)) game.removeChild(obstacle);
+          return;
+        }
+
+        if (pos <= 0) {
+          clearInterval(move);
+          game.removeChild(obstacle);
+          score++;
+          status.innerText = `Score: ${score}`;
+        } else {
+          pos -= 5;
+          obstacle.style.left = pos + 'px';
+
+          const runnerBottom = parseInt(runner.style.bottom || 0);
+          if (pos < 90 && pos > 40 && runnerBottom < 40) {
+            clearInterval(move);
+            gameOver = true;
+            status.innerText = "💥 Game Over! Final Score: " + score + " (Press Space to Restart)";
+          }
+        }
+      }, 30);
+    }
+
+    setInterval(createObstacle, 2000);
+  </script>
+
+</body>
+</html>
