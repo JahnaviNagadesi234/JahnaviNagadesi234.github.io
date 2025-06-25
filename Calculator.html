@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Calculator</title>
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --text: #000;
+      --button: #eee;
+      --hover: #ccc;
+      --clear: #ff4d4d;
+    }
+    body.dark {
+      --bg: #1f1f1f;
+      --text: #fff;
+      --button: #444;
+      --hover: #666;
+      --clear: #ff3333;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: all 0.3s;
+    }
+    .calculator {
+      background: var(--button);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    input[type="text"] {
+      width: 100%;
+      font-size: 24px;
+      padding: 10px;
+      text-align: right;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 60px);
+      gap: 10px;
+    }
+    button {
+      font-size: 18px;
+      padding: 15px;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--button);
+      color: var(--text);
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: var(--hover);
+    }
+    .clear {
+      background-color: var(--clear);
+      color: white;
+    }
+    .wide {
+      grid-column: span 2;
+    }
+    .theme-toggle {
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" id="display" readonly>
+    <div class="buttons">
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('/')">/</button>
+
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('*')">*</button>
+
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="append('-')">-</button>
+
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button onclick="calculate()">=</button>
+      <button onclick="append('+')">+</button>
+
+      <button onclick="clearDisplay()" class="clear wide">Clear</button>
+      <button onclick="backspace()">←</button>
+      <button onclick="append('%')">%</button>
+    </div>
+    <div class="theme-toggle">
+      <button onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById("display");
+
+    function append(value) {
+      const lastChar = display.value.slice(-1);
+      const operators = "+-*/%";
+
+      if (operators.includes(lastChar) && operators.includes(value)) {
+        return; // prevent multiple operators
+      }
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = '';
+    }
+
+    function backspace() {
+      display.value = display.value.slice(0, -1);
+    }
+
+    function calculate() {
+      try {
+        let result = eval(display.value.replace('%', '/100'));
+        display.value = result;
+      } catch (e) {
+        alert("Invalid Expression");
+      }
+    }
+
+    // Keyboard support
+    document.addEventListener('keydown', function(e) {
+      const allowed = '0123456789+-*/%.';
+      if (allowed.includes(e.key)) {
+        append(e.key);
+      } else if (e.key === 'Enter') {
+        calculate();
+      } else if (e.key === 'Backspace') {
+        backspace();
+      } else if (e.key === 'Escape') {
+        clearDisplay();
+      }
+    });
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+</body>
+</html>
